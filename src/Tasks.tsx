@@ -1,19 +1,14 @@
 import { useState } from "react";
 import Button from "./components/Button";
-import type { TaskItemProps, TaskListProps } from "./types";
+import type { Task } from "./types";
+import { useTasks, useTasksDispatch } from "./TasksContext";
 
-const TaskList = ({ tasks, onEdit, onDelete }: TaskListProps) => {
+const TaskList = () => {
+  const tasks = useTasks();
   return (
     <>
       {tasks.map((task) => {
-        return (
-          <Tasks
-            key={task.id}
-            task={task}
-            onEdit={onEdit}
-            onDelete={onDelete}
-          />
-        );
+        return <Task key={task.id} task={task} />;
       })}
     </>
   );
@@ -21,18 +16,26 @@ const TaskList = ({ tasks, onEdit, onDelete }: TaskListProps) => {
 
 export default TaskList;
 
-const Tasks = ({ task, onEdit, onDelete }: TaskItemProps) => {
-  const [isEdit, setIsEdit] = useState<boolean>(false);
+type TaskProps = {
+  task: Task;
+};
+
+const Task = ({ task }: TaskProps) => {
   const { id, text, done } = task;
+  const [isEdit, setIsEdit] = useState<boolean>(false);
+  const dispatch = useTasksDispatch();
   return (
     <div className="flex gap-3 items-center">
       <input
         type="checkbox"
         checked={done}
         onChange={(e) => {
-          onEdit({
-            ...task,
-            done: e.target.checked,
+          dispatch({
+            type: "edit",
+            payload: {
+              ...task,
+              done: e.target.checked,
+            },
           });
         }}
       />
@@ -42,9 +45,12 @@ const Tasks = ({ task, onEdit, onDelete }: TaskItemProps) => {
           type="text"
           value={text}
           onChange={(e) => {
-            onEdit({
-              ...task,
-              text: e.target.value,
+            dispatch({
+              type: "edit",
+              payload: {
+                ...task,
+                text: e.target.value,
+              },
             });
           }}
         />
@@ -55,7 +61,12 @@ const Tasks = ({ task, onEdit, onDelete }: TaskItemProps) => {
       <Button
         variant="danger"
         onClick={() => {
-          onDelete(id);
+          dispatch({
+            type: "delete",
+            payload: {
+              id: id,
+            },
+          });
         }}
       >
         delete
