@@ -4,3 +4,6 @@ here i learn
 - how to use reducer with immerjs
 - some tailwind
 - some typescript
+
+updated:
+- refactor reducer with usecontext
